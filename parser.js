@@ -84,3 +84,15 @@ for(let i=0; i<sepLines.length; i++){
         console.log(location);
     }
 }
+
+//chatlogs sort
+
+let chatLines = lines(chatLogs);
+let filtered = [];
+
+for(let i=0; i<chatLines.length; i++){
+    if(chatLines[i].includes("будет атакован кланом")){
+        filtered.push(chatLines[i]);
+        
+    }
+}
