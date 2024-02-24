@@ -55,56 +55,79 @@ console.log("start");
 let regex = `База \(*`;
 //Splits text into lines
 function lines(text) {
-    return text.split("\n");
+  return text.split("\n");
 }
 function getPosition(string, subString, index) {
-    return string.split(subString, index).join(subString).length;
+  return string.split(subString, index).join(subString).length;
 }
 // oneLine = oneLine.substring(oneLine.indexOf(", ")+", ".length, oneLine.length);
 //Take the data string, remove the part with the data collected, leave the rest and return it back
 function removeCollectedFromData(dataString, matchString) {
-    return dataString.substring(dataString.indexOf(matchString) + matchString.length, dataString.length);
+  return dataString.substring(
+    dataString.indexOf(matchString) + matchString.length,
+    dataString.length
+  );
 }
 let logs = [];
-let fights = [];
-function parseInfo(lines) {
-    for (let i = 0; i < lines.length; i++) {
-        if (lines[i].length > 1) {
-            let oneLine = lines[i];
-            let location = oneLine.slice(oneLine.indexOf("База (") + "База (".length, oneLine.indexOf(","));
-            oneLine = removeCollectedFromData(oneLine, ", ");
-            let island = oneLine.slice(oneLine.indexOf('Остров "') + 'Остров "'.length, oneLine.indexOf(",") - ",".length);
-            oneLine = removeCollectedFromData(oneLine, ", ");
-            let builder = oneLine.slice(oneLine.indexOf('построенный кланом "') + 'построенный кланом "'.length, oneLine.indexOf(",") - ",".length);
-            oneLine = removeCollectedFromData(oneLine, ", ");
-            let attackerClan = oneLine.slice(oneLine.indexOf('атакован кланом "') + 'атакован кланом "'.length, oneLine.indexOf('" '));
-            oneLine = removeCollectedFromData(oneLine, '" ');
-            //Date is always XX.XX.XX
-            let date = oneLine.slice(0, "XX.XX.XX".length);
-            //Time is always XX:XX
-            let time = oneLine.slice("XX.XX.XX ".length, "XX.XX.XX ".length + "YY:YY".length);
-            return {
-                location: location,
-                island: island,
-                builder: builder,
-                attacker: attackerClan,
-                date: date,
-                time: time,
-            };
-        }
-    }
+function parseDataLine(line) {
+  let oneLine = line;
+  let location = oneLine.slice(
+    oneLine.indexOf("База (") + "База (".length,
+    oneLine.indexOf(",")
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+  let island = oneLine.slice(
+    oneLine.indexOf('Остров "') + 'Остров "'.length,
+    oneLine.indexOf(",") - ",".length
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+  let builder = oneLine.slice(
+    oneLine.indexOf('построенный кланом "') + 'построенный кланом "'.length,
+    oneLine.indexOf(",") - ",".length
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+  let attackerClan = oneLine.slice(
+    oneLine.indexOf('атакован кланом "') + 'атакован кланом "'.length,
+    oneLine.indexOf('" ')
+  );
+  oneLine = removeCollectedFromData(oneLine, '" ');
+  //Date is always XX.XX.XX
+  let date = oneLine.slice(0, "XX.XX.XX".length);
+  //Time is always XX:XX
+  let time = oneLine.slice(
+    "XX.XX.XX ".length,
+    "XX.XX.XX ".length + "YY:YY".length
+  );
+  return {
+    location: location,
+    island: island,
+    builder: builder,
+    attacker: attackerClan,
+    date: date,
+    time: time,
+  };
 }
-//chatlogs sort
-function sortDefinedAttacks(unsortedLogs) {
-    let sortedLogs = [];
-    for (let i = 0; i < unsortedLogs.length; i++) {
-        if (unsortedLogs[i].includes("будет атакован кланом")) {
-            sortedLogs.push(unsortedLogs[i]);
-        }
+function parseDataFull(lines) {
+  console.log(lines.length);
+  var fights = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].length > 1) {
+      fights.push(parseDataLine(lines[i]));
     }
-    return sortedLogs;
+  }
+  return fights;
+}
+//Only leave confirmed attacks in logs
+function filterDefinedAttacks(unsortedLogs) {
+  let sortedLogs = [];
+  for (let i = 0; i < unsortedLogs.length; i++) {
+    if (unsortedLogs[i].includes("будет атакован кланом")) {
+      sortedLogs.push(unsortedLogs[i]);
+    }
+  }
+  return sortedLogs;
 }
 let warLines = lines(warLogs2);
-let filtered = sortDefinedAttacks(warLines);
-let parsed = parseInfo(filtered);
+let filtered = filterDefinedAttacks(warLines);
+let parsed = parseDataFull(filtered);
 console.log(parsed);

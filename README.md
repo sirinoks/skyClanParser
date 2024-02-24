@@ -18,7 +18,12 @@ node parser.js
 npx tsc
 ```
 
-## Uses ##
+```
+prettier -w .
+```
+
+## Uses
+
 - Javascript
 - Typescript
 - Docker

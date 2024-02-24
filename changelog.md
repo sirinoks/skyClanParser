@@ -1,10 +1,17 @@
+## V.01.00.01
 
-
-## V.1.0.0 ##
 2024.02.24
+
+- Handles multiple logs
+
+## V.01.00.00
+
+2024.02.23
+
 - Breaks apart mock logs into a proper object
 
+## Version
 
-## Version ##
-*Date*
+_Date_
+
 - Change

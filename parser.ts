@@ -62,13 +62,13 @@ function lines(text: string) {
   return text.split("\n");
 }
 
-function getPosition(string:string, subString:string, index:number) {
+function getPosition(string: string, subString: string, index: number) {
   return string.split(subString, index).join(subString).length;
 }
 
 // oneLine = oneLine.substring(oneLine.indexOf(", ")+", ".length, oneLine.length);
 //Take the data string, remove the part with the data collected, leave the rest and return it back
-function removeCollectedFromData(dataString:string, matchString:string) {
+function removeCollectedFromData(dataString: string, matchString: string) {
   return dataString.substring(
     dataString.indexOf(matchString) + matchString.length,
     dataString.length
@@ -76,56 +76,62 @@ function removeCollectedFromData(dataString:string, matchString:string) {
 }
 
 let logs = [];
-let fights = [];
 
-function parseInfo(lines: Array<string>) {
+function parseDataLine(line: string) {
+  let oneLine = line;
+
+  let location = oneLine.slice(
+    oneLine.indexOf("База (") + "База (".length,
+    oneLine.indexOf(",")
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+
+  let island = oneLine.slice(
+    oneLine.indexOf('Остров "') + 'Остров "'.length,
+    oneLine.indexOf(",") - ",".length
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+
+  let builder = oneLine.slice(
+    oneLine.indexOf('построенный кланом "') + 'построенный кланом "'.length,
+    oneLine.indexOf(",") - ",".length
+  );
+  oneLine = removeCollectedFromData(oneLine, ", ");
+
+  let attackerClan = oneLine.slice(
+    oneLine.indexOf('атакован кланом "') + 'атакован кланом "'.length,
+    oneLine.indexOf('" ')
+  );
+  oneLine = removeCollectedFromData(oneLine, '" ');
+
+  //Date is always XX.XX.XX
+  let date = oneLine.slice(0, "XX.XX.XX".length);
+
+  //Time is always XX:XX
+  let time = oneLine.slice(
+    "XX.XX.XX ".length,
+    "XX.XX.XX ".length + "YY:YY".length
+  );
+
+  return {
+    location: location,
+    island: island,
+    builder: builder,
+    attacker: attackerClan,
+    date: date,
+    time: time,
+  };
+}
+
+function parseDataFull(lines: Array<string>) {
+  console.log(lines.length);
+  var fights: Array<object> = [];
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].length > 1) {
-      let oneLine = lines[i];
-
-      let location = oneLine.slice(
-        oneLine.indexOf("База (") + "База (".length,
-        oneLine.indexOf(",")
-      );
-      oneLine = removeCollectedFromData(oneLine, ", ");
-
-      let island = oneLine.slice(
-        oneLine.indexOf('Остров "') + 'Остров "'.length,
-        oneLine.indexOf(",") - ",".length
-      );
-      oneLine = removeCollectedFromData(oneLine, ", ");
-
-      let builder = oneLine.slice(
-        oneLine.indexOf('построенный кланом "') + 'построенный кланом "'.length,
-        oneLine.indexOf(",") - ",".length
-      );
-      oneLine = removeCollectedFromData(oneLine, ", ");
-
-      let attackerClan = oneLine.slice(
-        oneLine.indexOf('атакован кланом "') + 'атакован кланом "'.length,
-        oneLine.indexOf('" ')
-      );
-      oneLine = removeCollectedFromData(oneLine, '" ');
-
-      //Date is always XX.XX.XX
-      let date = oneLine.slice(0, "XX.XX.XX".length);
-
-      //Time is always XX:XX
-      let time = oneLine.slice(
-        "XX.XX.XX ".length,
-        "XX.XX.XX ".length + "YY:YY".length
-      );
-
-      return {
-        location: location,
-        island: island,
-        builder: builder,
-        attacker: attackerClan,
-        date: date,
-        time: time,
-      };
+      fights.push(parseDataLine(lines[i]));
     }
   }
+  return fights;
 }
 
 //Only leave confirmed attacks in logs
@@ -141,5 +147,5 @@ function filterDefinedAttacks(unsortedLogs: Array<string>) {
 
 let warLines = lines(warLogs2);
 let filtered = filterDefinedAttacks(warLines);
-let parsed = parseInfo(filtered);
+let parsed = parseDataFull(filtered);
 console.log(parsed);

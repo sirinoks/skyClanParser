@@ -1,7 +1,7 @@
 {
-    "extends": "@tsconfig/node21/tsconfig.json",
-    "exclude": ["node_modules"],
-    "compilerOptions": {
-        "lib": ["ES2022"],
-    }
+  "extends": "@tsconfig/node21/tsconfig.json",
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "lib": ["ES2021.WeakRef", "ES2022"]
+  }
 }
