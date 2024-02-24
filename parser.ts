@@ -128,8 +128,8 @@ function parseInfo(lines: Array<string>) {
   }
 }
 
-//chatlogs sort
-function sortDefinedAttacks(unsortedLogs: Array<string>) {
+//Only leave confirmed attacks in logs
+function filterDefinedAttacks(unsortedLogs: Array<string>) {
   let sortedLogs: Array<string> = [];
   for (let i = 0; i < unsortedLogs.length; i++) {
     if (unsortedLogs[i].includes("будет атакован кланом")) {
@@ -140,6 +140,6 @@ function sortDefinedAttacks(unsortedLogs: Array<string>) {
 }
 
 let warLines = lines(warLogs2);
-let filtered = sortDefinedAttacks(warLines);
+let filtered = filterDefinedAttacks(warLines);
 let parsed = parseInfo(filtered);
 console.log(parsed);
