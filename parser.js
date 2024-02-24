@@ -78,69 +78,42 @@ let logs = [];
 let fights = [];
 
 let sepLines = lines(warLogs2);
-//console.log(sepLines);
 function parseInfo(lines){
     for(let i=0; i<lines.length; i++){
         if(lines[i].length>1){
-            //console.log("*********");
             let fight = {};
             let oneLine = lines[i];
 
 
             let location = oneLine.slice(oneLine.indexOf("База (")+"База (".length, oneLine.indexOf(","));
-
             oneLine = removeCollectedFromData(oneLine, ", ");
 
-            console.log("location:");
-            console.log(location);
-
-            console.log(oneLine);
-
-
-            let target = oneLine.slice(oneLine.indexOf("Остров \"")+"Остров \"".length, oneLine.indexOf(",")-",".length);
-            console.log("target island:");
-            console.log(target);
-
+            let island = oneLine.slice(oneLine.indexOf("Остров \"")+"Остров \"".length, oneLine.indexOf(",")-",".length);
             oneLine = removeCollectedFromData(oneLine, ", ");
 
-            console.log(oneLine);
-
-            let clan = oneLine.slice(oneLine.indexOf("построенный кланом \"")+"построенный кланом \"".length, oneLine.indexOf(",")-",".length);
-            console.log("builder clan:");
-            console.log(clan);
-
+            let builder = oneLine.slice(oneLine.indexOf("построенный кланом \"")+"построенный кланом \"".length, oneLine.indexOf(",")-",".length);
             oneLine = removeCollectedFromData(oneLine, ", ");
-            console.log(oneLine);
 
             let attackerClan = oneLine.slice(oneLine.indexOf("атакован кланом \"")+"атакован кланом \"".length, oneLine.indexOf("\" "));
-
-            console.log("attacker clan:");
-            console.log(attackerClan);
-
             oneLine = removeCollectedFromData(oneLine, "\" ");
-            console.log(oneLine);
 
-            // let time = oneLine.split(' ', 1);
-            // let time = oneLine.slice(0, oneLine.indexOf(' '));
-            let time = oneLine.slice(oneLine.indexOf("по мск")-6, oneLine.indexOf("по мск"));
-            let date = oneLine.slice(oneLine.indexOf("по мск")-15, oneLine.indexOf("по мск")-6);
+            //Date is always XX.XX.XX
+            let date = oneLine.slice(0, "XX.XX.XX".length);
 
-            console.log("time and date:");
-            console.log(time);
-            console.log(date);
-
-
-
+            //Time is always XX:XX
+            let time = oneLine.slice("XX.XX.XX ".length, "XX.XX.XX ".length+"YY:YY".length);
             
-            let regex = /База \(*/m;
-            // console.log(oneLine[time.length]);
-            // console.log(time.length+oneLine.indexOf("База ("));
-    
-            // let location = oneLine.split(regex, 1);
+            return {
+                "location": location,
+                "island": island,
+                "builder": builder,
+                "attacker": attackerClan,
+                "date": date,
+                "time": time
+            }
         }
     }
 }
-
 
 
 
@@ -159,7 +132,7 @@ function sortDefinedAttacks(unsortedLogs){
 let warLines = lines(warLogs2);
 let filtered = sortDefinedAttacks(warLines);
 let parsed = parseInfo(filtered);
-// console.log(filtered);
+console.log(parsed);
 
 
 
