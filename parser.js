@@ -21,6 +21,7 @@ const warLogs1 = `
 09:30:35 База (Осколки) Разработаны планы атаки на клан "Guard Heaven" (1 шт.), нападение возможно до 22 фев. 09:30
 `;
 
+//work with these
 const warLogs2 = `
 13:10:00 База (Поющий Риф, [Лабиринт Ф 10:82]) Подтверждена наша заявка на атаку острова "производим Метамфетамин /Добывающий остров [3]", построенного кланом "небесные алхимики", 22.02.24 21:30 по мск., находящегося под контролем клана "Guard Heaven"
 13:10:00 База (Поющий Риф, [Лабиринт Ф 33:81]) Подтверждена наша заявка на атаку острова "ДК им.У.Уайта и Дж.Пинкмана /Добывающий остров [3]", построенного кланом "небесные алхимики", 22.02.24 21:00 по мск., находящегося под контролем клана "Guard Heaven"
@@ -28,7 +29,9 @@ const warLogs2 = `
 13:10:00 База (Поющий Риф, [Остров свёрнут]) Подтверждена наша заявка на атаку острова "КИМ не смог поменять права, бебе /Остров-склад [3]" 22.02.24 23:00 по мск., находящийся под контролем клана "Небесная_КанЦеляриЯ"
 13:10:00 База (Поющий Риф, [Остров свёрнут]) Подтверждена наша заявка на атаку острова "ФАРМ /Генератор тоннелей ветра [3]" 22.02.24 23:30 по мск., находящийся под контролем клана "Небесная_КанЦеляриЯ"
 13:10:00 База (Поющий Риф, [Лабиринт П 64:77]) Подтверждена наша заявка на атаку острова "ЖАРА /Генератор тоннелей ветра [3]", построенного кланом "Guard Heaven", 22.02.24 22:00 по мск., находящегося под контролем клана "Небесная_КанЦеляриЯ"
-13:10:13 База (Осколки) Мы напали на остров "РОСЛИ 3 /Генератор 
+13:10:01 База (Поющий Риф, [Лабиринт Р 14:36]) Остров "Пелотас /Генератор тоннелей ветра [1]", построенный кланом "Истина", будет атакован кланом "Omega Rising" 24.02.24 21:30 по мск.
+13:10:01 База (Поющий Риф, [Лабиринт Ф 79:10]) Остров "ДОБЫВАЮЩИЙ ОСТРОВ "БезлапаяМуха" /Добывающий остров [3]", построенный кланом "Wizards of the Sky", будет атакован кланом "Omega Rising" 24.02.24 22:30 по мск.
+13:10:01 База (Поющий Риф, [Лабиринт Т 81:20]) Остров "Склад - реплоиды /Остров-склад [3]", построенный кланом "Wizards of the Sky", будет атакован кланом "Omega Rising" 24.02.24 22:00 по мск.
 `
 
 const chatLogs = `
@@ -59,40 +62,105 @@ function lines(text) {
     return text.split('\n')
 }
 
+function getPosition(string, subString, index) {
+    return string.split(subString, index).join(subString).length;
+}
+
+
+// oneLine = oneLine.substring(oneLine.indexOf(", ")+", ".length, oneLine.length);
+//Take the data string, remove the part with the data collected, leave the rest and return it back
+function removeCollectedFromData(dataString, matchString){
+    return dataString.substring(dataString.indexOf(matchString)+matchString.length, dataString.length);
+}
+
+
 let logs = [];
 let fights = [];
 
 let sepLines = lines(warLogs2);
-console.log(sepLines);
-
-for(let i=0; i<sepLines.length; i++){
-    if(sepLines[i].length>1){
-        console.log("*********");
-        let fight = {};
-        let oneLine = sepLines[i];
-        // let time = oneLine.split(' ', 1);
-        let time = oneLine.slice(0, oneLine.indexOf(' '));
+//console.log(sepLines);
+function parseInfo(lines){
+    for(let i=0; i<lines.length; i++){
+        if(lines[i].length>1){
+            //console.log("*********");
+            let fight = {};
+            let oneLine = lines[i];
 
 
+            let location = oneLine.slice(oneLine.indexOf("База (")+"База (".length, oneLine.indexOf(","));
 
-        let regex = /База \(*/m;
-        let location = oneLine.slice(oneLine.indexOf("База (")+"База (".length, oneLine.indexOf(","));
-        // console.log(oneLine[time.length]);
-        // console.log(time.length+oneLine.indexOf("База ("));
+            oneLine = removeCollectedFromData(oneLine, ", ");
 
-        // let location = oneLine.split(regex, 1);
-        console.log(location);
+            console.log("location:");
+            console.log(location);
+
+            console.log(oneLine);
+
+
+            let target = oneLine.slice(oneLine.indexOf("Остров \"")+"Остров \"".length, oneLine.indexOf(",")-",".length);
+            console.log("target island:");
+            console.log(target);
+
+            oneLine = removeCollectedFromData(oneLine, ", ");
+
+            console.log(oneLine);
+
+            let clan = oneLine.slice(oneLine.indexOf("построенный кланом \"")+"построенный кланом \"".length, oneLine.indexOf(",")-",".length);
+            console.log("builder clan:");
+            console.log(clan);
+
+            oneLine = removeCollectedFromData(oneLine, ", ");
+            console.log(oneLine);
+
+            let attackerClan = oneLine.slice(oneLine.indexOf("атакован кланом \"")+"атакован кланом \"".length, oneLine.indexOf("\" "));
+
+            console.log("attacker clan:");
+            console.log(attackerClan);
+
+            oneLine = removeCollectedFromData(oneLine, "\" ");
+            console.log(oneLine);
+
+            // let time = oneLine.split(' ', 1);
+            // let time = oneLine.slice(0, oneLine.indexOf(' '));
+            let time = oneLine.slice(oneLine.indexOf("по мск")-6, oneLine.indexOf("по мск"));
+            let date = oneLine.slice(oneLine.indexOf("по мск")-15, oneLine.indexOf("по мск")-6);
+
+            console.log("time and date:");
+            console.log(time);
+            console.log(date);
+
+
+
+            
+            let regex = /База \(*/m;
+            // console.log(oneLine[time.length]);
+            // console.log(time.length+oneLine.indexOf("База ("));
+    
+            // let location = oneLine.split(regex, 1);
+        }
     }
 }
+
+
+
 
 //chatlogs sort
-
-let chatLines = lines(chatLogs);
-let filtered = [];
-
-for(let i=0; i<chatLines.length; i++){
-    if(chatLines[i].includes("будет атакован кланом")){
-        filtered.push(chatLines[i]);
-        
+function sortDefinedAttacks(unsortedLogs){
+    let sortedLogs=[];
+    for(let i=0; i<unsortedLogs.length; i++){
+        if(unsortedLogs[i].includes("будет атакован кланом")){
+            sortedLogs.push(unsortedLogs[i]);            
+        }
     }
+    return sortedLogs;
 }
+
+
+let warLines = lines(warLogs2);
+let filtered = sortDefinedAttacks(warLines);
+let parsed = parseInfo(filtered);
+// console.log(filtered);
+
+
+
+
