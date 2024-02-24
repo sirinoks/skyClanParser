@@ -21,5 +21,11 @@
   "homepage": "https://github.com/sirinoks/skyClanParser#readme",
   "dependencies": {
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@tsconfig/node21": "^21.0.1",
+    "@tsconfig/recommended": "^1.0.3",
+    "@types/node": "^20.11.20",
+    "typescript": "^5.3.3"
   }
 }

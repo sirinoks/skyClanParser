@@ -13,3 +13,13 @@ docker build -t sirinoks/skyclanparser .
 ```
 node parser.js
 ```
+
+```
+npx tsc
+```
+
+## Uses ##
+- Javascript
+- Typescript
+- Docker
+- Express
