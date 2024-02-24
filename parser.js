@@ -32,7 +32,7 @@ const warLogs2 = `
 13:10:01 База (Поющий Риф, [Лабиринт Р 14:36]) Остров "Пелотас /Генератор тоннелей ветра [1]", построенный кланом "Истина", будет атакован кланом "Omega Rising" 24.02.24 21:30 по мск.
 13:10:01 База (Поющий Риф, [Лабиринт Ф 79:10]) Остров "ДОБЫВАЮЩИЙ ОСТРОВ "БезлапаяМуха" /Добывающий остров [3]", построенный кланом "Wizards of the Sky", будет атакован кланом "Omega Rising" 24.02.24 22:30 по мск.
 13:10:01 База (Поющий Риф, [Лабиринт Т 81:20]) Остров "Склад - реплоиды /Остров-склад [3]", построенный кланом "Wizards of the Sky", будет атакован кланом "Omega Rising" 24.02.24 22:00 по мск.
-`
+`;
 
 const chatLogs = `
 13:10 (Периферия) остров "Мама куба села и база утонула" завтра будет атакован кланом "Guard Heaven" в 21:30 по мск.
@@ -58,82 +58,88 @@ console.log("start");
 let regex = `База \(*`;
 
 //Splits text into lines
-function lines(text) {  
-    return text.split('\n')
+function lines(text) {
+  return text.split("\n");
 }
 
 function getPosition(string, subString, index) {
-    return string.split(subString, index).join(subString).length;
+  return string.split(subString, index).join(subString).length;
 }
-
 
 // oneLine = oneLine.substring(oneLine.indexOf(", ")+", ".length, oneLine.length);
 //Take the data string, remove the part with the data collected, leave the rest and return it back
-function removeCollectedFromData(dataString, matchString){
-    return dataString.substring(dataString.indexOf(matchString)+matchString.length, dataString.length);
+function removeCollectedFromData(dataString, matchString) {
+  return dataString.substring(
+    dataString.indexOf(matchString) + matchString.length,
+    dataString.length
+  );
 }
-
 
 let logs = [];
 let fights = [];
 
-let sepLines = lines(warLogs2);
-function parseInfo(lines){
-    for(let i=0; i<lines.length; i++){
-        if(lines[i].length>1){
-            let fight = {};
-            let oneLine = lines[i];
+function parseInfo(lines) {
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].length > 1) {
+      let oneLine = lines[i];
 
+      let location = oneLine.slice(
+        oneLine.indexOf("База (") + "База (".length,
+        oneLine.indexOf(",")
+      );
+      oneLine = removeCollectedFromData(oneLine, ", ");
 
-            let location = oneLine.slice(oneLine.indexOf("База (")+"База (".length, oneLine.indexOf(","));
-            oneLine = removeCollectedFromData(oneLine, ", ");
+      let island = oneLine.slice(
+        oneLine.indexOf('Остров "') + 'Остров "'.length,
+        oneLine.indexOf(",") - ",".length
+      );
+      oneLine = removeCollectedFromData(oneLine, ", ");
 
-            let island = oneLine.slice(oneLine.indexOf("Остров \"")+"Остров \"".length, oneLine.indexOf(",")-",".length);
-            oneLine = removeCollectedFromData(oneLine, ", ");
+      let builder = oneLine.slice(
+        oneLine.indexOf('построенный кланом "') + 'построенный кланом "'.length,
+        oneLine.indexOf(",") - ",".length
+      );
+      oneLine = removeCollectedFromData(oneLine, ", ");
 
-            let builder = oneLine.slice(oneLine.indexOf("построенный кланом \"")+"построенный кланом \"".length, oneLine.indexOf(",")-",".length);
-            oneLine = removeCollectedFromData(oneLine, ", ");
+      let attackerClan = oneLine.slice(
+        oneLine.indexOf('атакован кланом "') + 'атакован кланом "'.length,
+        oneLine.indexOf('" ')
+      );
+      oneLine = removeCollectedFromData(oneLine, '" ');
 
-            let attackerClan = oneLine.slice(oneLine.indexOf("атакован кланом \"")+"атакован кланом \"".length, oneLine.indexOf("\" "));
-            oneLine = removeCollectedFromData(oneLine, "\" ");
+      //Date is always XX.XX.XX
+      let date = oneLine.slice(0, "XX.XX.XX".length);
 
-            //Date is always XX.XX.XX
-            let date = oneLine.slice(0, "XX.XX.XX".length);
+      //Time is always XX:XX
+      let time = oneLine.slice(
+        "XX.XX.XX ".length,
+        "XX.XX.XX ".length + "YY:YY".length
+      );
 
-            //Time is always XX:XX
-            let time = oneLine.slice("XX.XX.XX ".length, "XX.XX.XX ".length+"YY:YY".length);
-            
-            return {
-                "location": location,
-                "island": island,
-                "builder": builder,
-                "attacker": attackerClan,
-                "date": date,
-                "time": time
-            }
-        }
+      return {
+        location: location,
+        island: island,
+        builder: builder,
+        attacker: attackerClan,
+        date: date,
+        time: time,
+      };
     }
+  }
 }
-
-
 
 //chatlogs sort
-function sortDefinedAttacks(unsortedLogs){
-    let sortedLogs=[];
-    for(let i=0; i<unsortedLogs.length; i++){
-        if(unsortedLogs[i].includes("будет атакован кланом")){
-            sortedLogs.push(unsortedLogs[i]);            
-        }
+function sortDefinedAttacks(unsortedLogs) {
+  let sortedLogs = [];
+  for (let i = 0; i < unsortedLogs.length; i++) {
+    if (unsortedLogs[i].includes("будет атакован кланом")) {
+      sortedLogs.push(unsortedLogs[i]);
     }
-    return sortedLogs;
+  }
+  return sortedLogs;
 }
-
 
 let warLines = lines(warLogs2);
 let filtered = sortDefinedAttacks(warLines);
 let parsed = parseInfo(filtered);
 console.log(parsed);
-
-
-
-
