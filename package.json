@@ -4,7 +4,8 @@
   "description": "Sky2fly scheduling fights parser",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "pretest": "tsc --incremental -p tests/tsconfig.json",
+    "test": "playwright test -c tests-out"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "express": "^4.18.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@tsconfig/node21": "^21.0.1",
     "@tsconfig/recommended": "^1.0.3",
     "@types/node": "^20.11.20",

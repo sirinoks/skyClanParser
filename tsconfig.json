@@ -2,6 +2,6 @@
   "extends": "@tsconfig/node21/tsconfig.json",
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "lib": ["ES2021.WeakRef", "ES2022"]
+    "lib": ["es2022.sharedmemory", "es2022"]
   }
 }
